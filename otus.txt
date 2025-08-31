@@ -1,0 +1,16 @@
+ 1170  docker pull selenoid/chrome:128.0
+ 1171  pytest tests/opencart_ui --browser remote  --alluredir allure-results 
+ 1172  pytest tests/opencart_ui --browser remote  --alluredir allure-results 
+ 1173  pytest tests/opencart_ui --browser remote  --alluredir allure-results 
+ 1174  pytest tests/opencart_ui --browser remote  --alluredir allure-results 
+ 1175  docker build -t otustest
+ 1176  docker build -t otustest.
+ 1177  docker build -t otustest .
+ 1178  docker build -t otustest .
+ 1179  docker build -t otustest .
+ 1180  docker build -t otustest .
+ 1181  docker build -t otustest .
+ 1182  docker run otustest -it
+ 1183  docker run otustest -it
+ 1184  docker build -t otustest .
+ 1185  docker build -t otustest .
