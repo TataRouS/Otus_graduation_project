@@ -1,10 +1,12 @@
 import time
-
 import allure
 import pytest
 import requests
 
 base_url = 'https://reqres.in/api'
+headers = {
+    "x-api-key": "reqres-free-v1"
+}
 
 @allure.title("Проверка позитивная/негативная для регистрации пользователя")
 @pytest.mark.parametrize(
@@ -16,7 +18,7 @@ base_url = 'https://reqres.in/api'
     ids=["Позитивная регистрация пользователя[200]", "Негативная регистрация пользователя[400]"]
 )
 def test_api_register_user(endpoint, payload, expected_status, expected_response):
-    response = requests.post(f"{base_url}{endpoint}", json=payload)
+    response = requests.post(f"{base_url}{endpoint}", json=payload, headers = headers)
     assert response.status_code == expected_status
     assert expected_response(response.json())
 
@@ -30,7 +32,7 @@ def test_api_register_user(endpoint, payload, expected_status, expected_response
     ids=["Позитивная авторизация пользователя[200]", "Негативная авторизация пользователя[400]"]
 )
 def test_api_login_user(endpoint, payload, expected_status, expected_response):
-    response = requests.post(f"{base_url}{endpoint}", json=payload)
+    response = requests.post(f"{base_url}{endpoint}", json=payload, headers = headers)
     assert response.status_code == expected_status
     assert expected_response(response.json())
 
@@ -44,7 +46,7 @@ def test_api_login_user(endpoint, payload, expected_status, expected_response):
     ids=["Позитивное получение данных пользователя[200]", "Негативное получение данных пользователя[404]"]
 )
 def test_api_get_user(endpoint, expected_status, expected_response):
-    response = requests.get(f"{base_url}{endpoint}")
+    response = requests.get(f"{base_url}{endpoint}", headers = headers)
     assert response.status_code == expected_status
     assert expected_response(response.json())
 
@@ -60,9 +62,9 @@ def test_api_get_user(endpoint, expected_status, expected_response):
 def test_api_update_user(endpoint, method, payload, expected_status, expected_response):
     url = f"{base_url}{endpoint}"
     if method == "PUT":
-        response = requests.put(url, json=payload)
+        response = requests.put(url, json=payload, headers = headers)
     elif method == "PATCH":
-        response = requests.patch(url, json=payload)
+        response = requests.patch(url, json=payload, headers = headers)
     assert response.status_code == expected_status
     assert expected_response(response.json())
 
@@ -78,7 +80,7 @@ def test_api_update_user(endpoint, method, payload, expected_status, expected_re
 def test_api_get_users(endpoint, expected_status, expected_response):
     url = f"{base_url}{endpoint}"
     start_time = time.time()
-    response = requests.get(url)
+    response = requests.get(url, headers = headers)
     end_time = time.time()
     assert response.status_code == expected_status
     assert expected_response(response.json())
@@ -98,9 +100,9 @@ def test_api_get_users(endpoint, expected_status, expected_response):
 def test_api_unknown_resource(endpoint, payload, expected_status, expected_response):
     url = f"{base_url}{endpoint}"
     if payload:
-        response = requests.put(url, json=payload)
+        response = requests.put(url, json=payload, headers = headers)
     else:
-        response = requests.get(url)
+        response = requests.get(url, headers = headers)
     assert response.status_code == expected_status
     if response.content:
         assert expected_response(response.json())
@@ -108,14 +110,14 @@ def test_api_unknown_resource(endpoint, payload, expected_status, expected_respo
 @allure.title("Проверка выхода пользователя из системы")
 def test_api_logout_user():
     register_endpoint = f"{base_url}/logout"
-    response = requests.post(register_endpoint)
+    response = requests.post(register_endpoint, headers = headers)
     assert response.status_code == 200
     assert response.json() == {}
 
 @allure.title("Проверка удаление пользователя")
 def test_api_delete_user():
     register_endpoint = f"{base_url}/users/2"
-    response = requests.delete(register_endpoint)
+    response = requests.delete(register_endpoint, headers = headers)
     assert response.status_code == 204
     assert response.text == ""
 
@@ -126,7 +128,7 @@ def test_api_new_user():
         "name": "morpheus",
         "job": "leader"
     }
-    response = requests.post(register_endpoint, json=payload)
+    response = requests.post(register_endpoint, json=payload, headers = headers)
     assert response.status_code == 201
     user_data = response.json()
     assert "name" in user_data
@@ -139,14 +141,14 @@ def test_api_new_user():
 @allure.title("Проверка на удаление информации о неизвестном ресурсе с ID 2")
 def test_api_delete_unknown_resource():
     register_endpoint = f"{base_url}/unknown/2"
-    response = requests.delete(register_endpoint)
+    response = requests.delete(register_endpoint, headers = headers)
     assert response.status_code == 204
     assert response.text == ""
 
 @allure.title("Проверка на получение информации о всех неизвестных ресурсах")
 def test_api_all_unknown_resources():
     register_endpoint = f"{base_url}/unknown"
-    response = requests.get(register_endpoint)
+    response = requests.get(register_endpoint, headers = headers)
     assert response.status_code == 200
     data = response.json().get("data")
     assert data is not None
