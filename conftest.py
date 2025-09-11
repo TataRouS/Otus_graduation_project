@@ -3,12 +3,13 @@ import logging
 import datetime
 import allure
 import json
+
 from selenium import webdriver
+
 from selenium.webdriver.chromium.options import ChromiumOptions
 from selenium.webdriver.chromium.service import ChromiumService
 from selenium.webdriver.firefox.options import Options as FFOptions
 from selenium.webdriver.chrome.options import Options as ChromeOptions
-from selenium.common.exceptions import WebDriverException
 
 
 def pytest_addoption(parser):
@@ -21,7 +22,7 @@ def pytest_addoption(parser):
         "--base_url", help="Base application url", default="192.168.0.10:8081"
     )
     parser.addoption("--log_level", action="store", default="INFO")
-    parser.addoption("--selenoid_url", action="store", default="http://localhost:4444/wd/hub")  # Fixed default
+    parser.addoption("--selenoid_url", action="store", default="http://localhost:4444/wd/hub")
 
 
 @pytest.fixture(scope="session")
@@ -55,12 +56,16 @@ def browser(request):
     logger.setLevel(level=log_level)
 
     logger.info("===> Test started at %s" % datetime.datetime.now())
+    logger.info("===> SELENOID URL %s" % selenoid_url)
 
     try:
         if browser_name in ["ch", "chrome"]:
             options = ChromeOptions()
             if headless:
                 options.add_argument("headless=new")
+            options.add_argument("--disable-gpu")
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
             driver = webdriver.Chrome(options=options)
         elif browser_name in ["ff", "firefox"]:
             options = FFOptions()
@@ -96,7 +101,6 @@ def browser(request):
                 command_executor=selenoid_url,
                 options=options)
 
-        # Attach capabilities to Allure
         allure.attach(
             name=driver.session_id,
             body=json.dumps(driver.capabilities, indent=4, ensure_ascii=False),
@@ -106,7 +110,13 @@ def browser(request):
         driver.logger = logger
         driver.test_name = request.node.name
 
-        logger.info("Browser %s started" % browser_name)
+        logger.info("Browser %s started" % browser)
+
+        # def fin():
+        #     driver.quit()
+        #     logger.info("===> Test finished at %s" % datetime.datetime.now())
+
+        # request.addfinalizer(fin)
 
         yield driver
 
@@ -182,3 +192,4 @@ def register_account_page_url(request):
             + request.config.getoption("--base_url")
             + "/en-gb?route=account/register"
     )
+
