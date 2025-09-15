@@ -3,6 +3,7 @@ import logging
 import datetime
 import allure
 import json
+import pymysql
 
 from selenium import webdriver
 
@@ -23,7 +24,33 @@ def pytest_addoption(parser):
     )
     parser.addoption("--log_level", action="store", default="INFO")
     parser.addoption("--selenoid_url", action="store", default="http://localhost:4444/wd/hub")
+    parser.addoption("--host", action="store", default="localhost", help="Database host")
+    parser.addoption("--port", action="store", default=3306, type=int, help="Database port")
+    parser.addoption("--database", action="store", default="opencart", help="Database name")
+    parser.addoption("--user", action="store", default="root", help="Database user")
+    parser.addoption("--password", action="store", default="", help="Database password")
 
+@pytest.fixture(scope="session")
+def connection(request):
+    host = request.config.getoption("--host")
+    port = request.config.getoption("--port")
+    database = request.config.getoption("--database")
+    user = request.config.getoption("--user")
+    password = request.config.getoption("--password")
+
+    conn = pymysql.connect(
+        host=host,
+        port=port,
+        user=user,
+        password=password,
+        database=database,
+        charset='utf8mb4',
+        autocommit=True
+    )
+
+    yield conn
+
+    conn.close()
 
 @pytest.fixture(scope="session")
 def base_url(request):
@@ -111,13 +138,6 @@ def browser(request):
         driver.test_name = request.node.name
 
         logger.info("Browser %s started" % browser)
-
-        # def fin():
-        #     driver.quit()
-        #     logger.info("===> Test finished at %s" % datetime.datetime.now())
-
-        # request.addfinalizer(fin)
-
         yield driver
 
     except Exception as e:
