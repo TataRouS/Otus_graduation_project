@@ -17,15 +17,14 @@ def create_customer(connection, customer_data: dict) -> int:
             email, 
             telephone, 
             password,
-            newsletter, 
-            address_id, 
-            custom_field, 
+            custom_field,
+            newsletter,
             ip, 
-            status, 
+            status,
             safe, 
             token, 
-            code, 
-            date_added
+            code,
+            date_added 
         ) VALUES (
             %(customer_group_id)s, 
             %(store_id)s, 
@@ -34,15 +33,14 @@ def create_customer(connection, customer_data: dict) -> int:
             %(lastname)s, 
             %(email)s, 
             %(telephone)s,  
+            1234,
             '',
+            0,  
+            '127.0.0.1',
             0, 
-            0, 
-            '', 
-            '127.0.0.1', 
             1, 
-            0, 
-            '', 
-            '', 
+            '',
+            1, 
             NOW()
         )
     """
