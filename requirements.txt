@@ -2,6 +2,7 @@ allure-pytest==2.14.3
 selenium==4.31.00
 pytest==8.3.5
 pytest-xdist==3.6.1
+PyMySQL==1.1.1
 
 h11~=0.14.0
 pip~=25.2
@@ -23,7 +24,4 @@ websocket-client~=1.8.0
 packaging~=24.2
 wsproto~=1.2.0
 allure-python-commons~=2.14.3
-ruff==0.6.9
-pytest-xdist==3.6.1
-faker==37.0.0
 requests==2.31.0
